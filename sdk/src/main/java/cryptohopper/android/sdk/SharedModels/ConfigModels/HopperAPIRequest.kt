@@ -165,9 +165,10 @@ open class HopperAPIRequest<Object> {
             client.newCall(request).execute().use { response ->
                 if (!response.isSuccessful){
                     if (HopperAPIConfigurationManager.shared.config.debugModeEnabled) {
-                        print("API ERROR RESPONSE :" + response.body.toString())
+                        print("API ERROR RESPONSE :" + response.body?.string() ?: "No response")
                     }
-                    onFail.invoke(HopperAPIError(response.code, response.body.toString(), 0))
+                    val jsonResponse = Gson().fromJson(response.body?.string() ?: "No response", HopperAPIError::class.java)
+                    onFail.invoke(jsonResponse)
                 }else{
                     if (HopperAPIConfigurationManager.shared.config.debugModeEnabled) {
                         print("API RESPONSE :" + response.body.toString())
